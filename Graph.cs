@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Graph
 {
@@ -10,6 +8,8 @@ namespace Graph
     {
         private List<Vertex> V = new List<Vertex>();
         private List<Edge> E = new List<Edge>();
+        private List<Vertex> way = new List<Vertex>();
+        public double WayCost { get; set; } = 0;
         public int VertexCount => V.Count;
 
         /// <summary>
@@ -37,7 +37,22 @@ namespace Graph
         public void AddEdge(Vertex from, Vertex to, double weight = 1)
         {
             var edge = new Edge(from, to, weight);
-            E.Add(edge);
+            if (!E.Contains(edge))
+            {
+                E.Add(edge);
+            }
+        }
+
+        /// <summary>
+        /// Добавляет существующее ребро в список ребер.
+        /// </summary>
+        /// <param name="edge">Ребро</param>
+        public void AddEdge(Edge edge)
+        {
+            if (!E.Contains(edge))
+            {
+                E.Add(edge);
+            }
         }
 
         /// <summary>
@@ -73,29 +88,81 @@ namespace Graph
         }
 
         /// <summary>
-        /// Проверяет, есть ли путь между указаными вершинами.
+        /// Создает список ребер, смежных с указанной вершиной.
         /// </summary>
-        /// <param name="start">Начальная вершина</param>
-        /// <param name="finish">Конечная вершина</param>
-        /// <returns>Значение true, если путь существует и значение false, если его нет.</returns>
-        public bool CheckWay(Vertex start, Vertex finish)
-        { 
-            var res = new List<Vertex>();
-            res.Add(start);
-
-            for (int i = 0; i < res.Count; i++)
+        /// <param name="vertex">Вершина</param>
+        /// <returns>Список смежных ребер</returns>
+        public List<Edge> GetEdgesList(Vertex vertex)
+        {
+            var res = new List<Edge>();
+            foreach (var edge in E)
             {
-                var vertex = res[i];
-                foreach (var v in GetVertexList(vertex))
-                {
-                    if (!res.Contains(v))
+                if (edge.To == vertex && edge.From.Level == vertex.Level - 1 && way.Contains(edge.From)) 
+                { 
+                    if (!res.Contains(edge))
                     {
-                        res.Add(v);
+                        res.Add(edge);
                     }
                 }
             }
-            return res.Contains(finish);
+            return res;
         }
 
+        /// <summary>
+        /// Создает список со всеми вершинами, которые могут встречаться на пути от начала до конца.
+        /// </summary>
+        /// <param name="start">Начальная вершина</param>
+        /// <param name="finish">Конечная вершина</param>
+        /// <returns>Возвращает список всех вершин на пути к финишу.</returns>
+        public List<Vertex> GetWayList(Vertex start, Vertex finish)
+        {
+            start.Level = 0;
+            way.Add(start);
+
+            for (int i = 0; i < way.Count; i++)
+            {
+                var vertex = way[i];
+                foreach (var v in GetVertexList(vertex))
+                {
+                    if (!way.Contains(v))
+                    {
+                        v.Level = vertex.Level + 1;
+                        way.Add(v);
+                    }
+                }
+                if(way.Contains(finish)) break;
+            }
+            return way;
+        }
+
+        /// <summary>
+        /// Находит кратчайший маршрут между двумя вершинами. (Волновой алгоритм)
+        /// </summary>
+        /// <param name="start">Начальная вершина</param>
+        /// <param name="finish">Конечная вершина</param>
+        /// <returns>Если путь из start в finish существует, то возвращает список, состоящий из вершин кратчайшего пути, иначе возвращает null</returns>
+        public List<Vertex> Wave(Vertex start, Vertex finish)
+        {
+            var resultWay = new List<Vertex>() { finish };
+            WayCost = 0;
+            way.Clear();
+            way = GetWayList(start, finish);
+            if (way.Contains(finish))
+            { 
+                var vertex = finish;
+
+                while(vertex != start)
+                {
+                    var bestEdge = GetEdgesList(vertex).OrderBy(edge => edge.Weight).ElementAt(0);
+                    vertex = bestEdge.From;
+                    resultWay.Add(vertex);
+                    WayCost += bestEdge.Weight;
+                }
+
+                resultWay.Reverse();
+                return resultWay;
+            }
+            return null;
+        }
     }
 }
