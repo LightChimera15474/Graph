@@ -140,7 +140,7 @@ namespace Graph
         /// </summary>
         /// <param name="start">Начальная вершина</param>
         /// <param name="finish">Конечная вершина</param>
-        /// <returns>Если путь из start в finish существует, то возвращает список, состоящий из вершин кратчайшего пути, иначе возвращает null</returns>
+        /// <returns>Если путь из start в finish существует, то возвращает список, состоящий из вершин пути, иначе возвращает null</returns>
         public List<Vertex> Wave(Vertex start, Vertex finish)
         {
             var resultWay = new List<Vertex>() { finish };
