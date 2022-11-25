@@ -74,7 +74,7 @@ namespace Graph
         /// </summary>
         /// <param name="vertex">Вершина</param>
         /// <returns>Список смежных вершин.</returns>
-        public List<Vertex> GetVertexList(Vertex vertex)
+        private List<Vertex> GetVertexList(Vertex vertex)
         {
             var res = new List<Vertex>();
             foreach (var edge in E)
@@ -92,7 +92,7 @@ namespace Graph
         /// </summary>
         /// <param name="vertex">Вершина</param>
         /// <returns>Список смежных ребер</returns>
-        public List<Edge> GetEdgesList(Vertex vertex)
+        private List<Edge> GetEdgesList(Vertex vertex)
         {
             var res = new List<Edge>();
             foreach (var edge in E)
@@ -114,7 +114,7 @@ namespace Graph
         /// <param name="start">Начальная вершина</param>
         /// <param name="finish">Конечная вершина</param>
         /// <returns>Возвращает список всех вершин на пути к финишу.</returns>
-        public List<Vertex> GetWayList(Vertex start, Vertex finish)
+        private List<Vertex> GetWayList(Vertex start, Vertex finish)
         {
             start.Level = 0;
             way.Add(start);
